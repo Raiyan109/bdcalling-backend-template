@@ -4,3 +4,4 @@ node_modules
 /winston
 
 
+/src/util/firebase.ts

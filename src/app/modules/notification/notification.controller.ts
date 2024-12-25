@@ -67,10 +67,66 @@ const deleteAllNotifications = catchAsync(
   }
 );
 
+//driver
+
+const getNotificationFromDriver = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await NotificationService.driverNotificationFromDB();
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: 'Notification retrived successfully',
+      data: result,
+    });
+  }
+);
+
+const readNotificationFromDriver = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await NotificationService.driverReadNotificationToDB();
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: 'Notification Read Successfully',
+      data: result,
+    });
+  }
+);
+
+//client
+
+const getNotificationFromClient = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await NotificationService.clientNotificationFromDB();
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: 'Notification retrived successfully',
+      data: result,
+    });
+  }
+);
+
+const readNotificationFromClient = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await NotificationService.clientReadNotificationToDB();
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: 'Notification Read Successfully',
+      data: result,
+    });
+  }
+);
+
 export const NotificationController = {
   getNotificationToDb,
   adminNotificationFromDB,
   readNotification,
   adminReadNotification,
   deleteAllNotifications,
+  getNotificationFromDriver,
+  readNotificationFromDriver,
+  getNotificationFromClient,
+  readNotificationFromClient,
 };

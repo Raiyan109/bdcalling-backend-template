@@ -5,6 +5,8 @@ import { DeliveryCofirmation } from './deliveryCofirmation.model';
 import { Order } from '../orderReq/orderReq.model';
 import { Schedule } from '../deliveryTime/deliveryTime.model';
 import { isTimeWithinRange } from '../../../shared/timeConvert';
+import { sendNotifications } from '../../../helpers/notificationHelper';
+import { Driver } from '../driver/driver.model';
 
 // const createOrderConfirmed = async (payload: Partial<IDeliveryCofirmation>) => {
 //   const isOrder = await Order.findById(payload.orderId);
@@ -110,6 +112,19 @@ const createOrderConfirmed = async (payload: Partial<IDeliveryCofirmation>) => {
   }
 
   const result = await DeliveryCofirmation.create(payload);
+
+  const isDriver: any = await Driver.findOne({ userId: payload.userId });
+
+  if (result.status === 'delivered') {
+    const value = {
+      text: `Your order has been ${result.status}!`,
+      receiver: isDriver._id,
+    };
+
+    if (schedule) {
+      sendNotifications(value);
+    }
+  }
 
   if (!result) {
     throw new ApiError(

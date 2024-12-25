@@ -1,5 +1,6 @@
 import { sendNotification } from '../../../util/firebase';
 import { IPushNotification } from './pushNotification.interface';
+import { PushNotification } from './pushNotification.model';
 
 const sendNotifications = async (payload: IPushNotification) => {
   const { tokens, title, body, data, userId } = payload;
@@ -12,6 +13,17 @@ const sendNotifications = async (payload: IPushNotification) => {
 
     // Send push notification
     const notification = await sendNotification(tokens, { title, body, data });
+
+    const result = await PushNotification.create({
+      title,
+      body,
+      tokens,
+      data,
+      userId,
+      status: notification.error ? 'failed' : 'sent',
+    });
+
+    console.log(result, 'result');
 
     return notification;
   } catch (error) {

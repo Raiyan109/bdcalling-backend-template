@@ -29,6 +29,20 @@ router.patch(
   NotificationController.adminReadNotification
 );
 
+//driver
+router.get(
+  '/driver',
+  auth(USER_ROLES.DRIVER),
+  NotificationController.getNotificationFromDriver
+);
+
+//client
+router.get(
+  '/client',
+  auth(USER_ROLES.CLIENT),
+  NotificationController.getNotificationFromClient
+);
+
 router.delete(
   '/delete-all',
   auth(USER_ROLES.ADMIN),

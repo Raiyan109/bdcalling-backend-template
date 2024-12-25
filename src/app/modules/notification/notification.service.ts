@@ -1,6 +1,8 @@
 import { JwtPayload } from 'jsonwebtoken';
 import { Notification } from './notification.model';
 import { SortOrder } from 'mongoose';
+import { INotification } from './notification.interface';
+import { USER_ROLES } from '../../../enums/user';
 
 const getNotificationToDb = async (user: JwtPayload) => {
   const result = await Notification.find({ receiver: user.id });
@@ -37,7 +39,7 @@ const adminNotification = async (query: Record<string, unknown>) => {
 
   // Set default sort order to show new data first
 
-  const result = await Notification.find()
+  const result = await Notification.find({ type: USER_ROLES.ADMIN })
 
     .sort({ createdAt: -1 })
     .skip(skip)
@@ -60,8 +62,38 @@ const adminNotification = async (query: Record<string, unknown>) => {
 
 const adminReadNotification = async () => {
   const result = await Notification.updateMany(
-    { type: 'ADMIN' },
-    { read: true }
+    { type: 'ADMIN', read: false },
+    { $set: { read: true } },
+    { new: true }
+  );
+  return result;
+};
+
+const driverNotificationFromDB = async () => {
+  const result = await Notification.find({ type: USER_ROLES.DRIVER });
+  return result;
+};
+
+// read notifications only for admin
+const driverReadNotificationToDB = async (): Promise<INotification | null> => {
+  const result: any = await Notification.updateMany(
+    { type: USER_ROLES.DRIVER, read: false },
+    { $set: { read: true } },
+    { new: true }
+  );
+  return result;
+};
+const clientNotificationFromDB = async () => {
+  const result = await Notification.find({ type: USER_ROLES.CLIENT });
+  return result;
+};
+
+// read notifications only for admin
+const clientReadNotificationToDB = async (): Promise<INotification | null> => {
+  const result: any = await Notification.updateMany(
+    { type: USER_ROLES.CLIENT, read: false },
+    { $set: { read: true } },
+    { new: true }
   );
   return result;
 };
@@ -77,4 +109,8 @@ export const NotificationService = {
   adminNotification,
   adminReadNotification,
   deleteAllNotifications,
+  driverNotificationFromDB,
+  driverReadNotificationToDB,
+  clientNotificationFromDB,
+  clientReadNotificationToDB,
 };

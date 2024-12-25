@@ -2,6 +2,7 @@ import { StatusCodes } from 'http-status-codes';
 import ApiError from '../../../errors/ApiError';
 import { IDeliveryTime } from './deliveryTime.interface';
 import { Schedule } from './deliveryTime.model';
+import { sendNotifications } from '../../../helpers/notificationHelper';
 
 const setSchedule = async (scheduleData: Partial<IDeliveryTime>) => {
   const { day, startTime, endTime, isOff } = scheduleData;
@@ -17,10 +18,12 @@ const setSchedule = async (scheduleData: Partial<IDeliveryTime>) => {
   );
 
   const value = {
-    text: 'New Time',
+    text: `Delivery time for ${day} is updated to ${startTime} to ${endTime}`,
+    type: 'DRIVER',
   };
 
   if (schedule) {
+    sendNotifications(value);
   }
 
   return schedule;

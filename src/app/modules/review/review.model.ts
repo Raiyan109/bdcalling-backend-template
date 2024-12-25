@@ -9,7 +9,7 @@ const reviewSchema = new Schema<IReview>(
     },
     user: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
+      ref: 'Client',
     },
     rating: {
       type: Number,

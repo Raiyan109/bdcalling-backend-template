@@ -14,7 +14,7 @@ router.post(
 
 router.post(
   '/login-for-social',
-  validateRequest(AuthValidation.createLoginZodSchemaForSocial),
+  // validateRequest(AuthValidation.createLoginZodSchemaForSocial),
   AuthController.loginUserForSocial
 );
 

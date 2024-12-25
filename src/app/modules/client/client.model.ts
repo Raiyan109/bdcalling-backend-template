@@ -30,6 +30,7 @@ const ClientSchema = new mongoose.Schema<IClient>(
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
+      required: true,
     },
     status: {
       type: String,

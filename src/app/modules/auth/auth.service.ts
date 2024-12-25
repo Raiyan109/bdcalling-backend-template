@@ -17,6 +17,10 @@ import generateOTP from '../../../util/generateOTP';
 import { User } from '../user/user.model';
 import { ResetToken } from '../resetToken/resetToken.model';
 import { sendNotifications } from '../../../helpers/notificationHelper';
+import { Driver } from '../driver/driver.model';
+import { Client } from '../client/client.model';
+import { startSession } from 'mongoose';
+import { USER_ROLES } from '../../../enums/user';
 
 //login
 const loginUserFromDB = async (payload: ILoginData) => {
@@ -76,35 +80,105 @@ const loginUserSocial = async (payload: ILoginData) => {
   const { email, appId, role, type, fcmToken } = payload;
 
   if (type === 'social') {
+    const session = await startSession();
     let user: any | null;
-    user = await User.findOne({ email });
 
-    if (!user) {
-      user = await User.create({
-        appId,
-        fcmToken,
-        role,
-        email,
-        verified: true,
-      });
+    try {
+      session.startTransaction();
+
+      // Check if user already exists
+      user = await User.findOne({ email });
+
+      if (!user) {
+        // Create user
+        const [newUser] = await User.create(
+          [
+            {
+              appId,
+              fcmToken,
+              role,
+              email,
+              verified: true,
+            },
+          ],
+          { session }
+        );
+
+        if (!newUser) {
+          throw new ApiError(
+            StatusCodes.INTERNAL_SERVER_ERROR,
+            'Failed to create user'
+          );
+        }
+
+        user = newUser;
+
+        // Create related entity based on role
+        if (role === USER_ROLES.CLIENT) {
+          await Client.create(
+            [
+              {
+                userId: user._id,
+                email: user.email,
+                status: 'active',
+                firstName: '', // Placeholder
+                lastName: '', // Placeholder
+                address: '', // Placeholder
+                image: '', // Placeholder
+                phone: '', // Placeholder
+              },
+            ],
+            { session }
+          );
+        } else if (role === USER_ROLES.DRIVER) {
+          await Driver.create(
+            [
+              {
+                userId: user._id,
+                email: user.email,
+                status: 'active',
+                firstName: '', // Placeholder
+                lastName: '', // Placeholder
+                address: '', // Placeholder
+                image: '', // Placeholder
+                phone: '', // Placeholder
+                licenseNumber: '', // Placeholder
+                vehicleDetails: '', // Placeholder
+              },
+            ],
+            { session }
+          );
+        }
+      }
+
+      // Commit transaction
+      await session.commitTransaction();
+
+      // Generate tokens
+      const accessToken = jwtHelper.createToken(
+        { id: user._id, role: user.role, email: user.email },
+        config.jwt.jwt_secret as Secret,
+        '7d'
+      );
+
+      const refreshToken = jwtHelper.createToken(
+        { id: user._id, role: user.role, email: user.email },
+        config.jwt.jwtRefreshSecret as Secret,
+        '15d'
+      );
+
+      return { accessToken, refreshToken };
+    } catch (error) {
+      // Abort transaction on error
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      // End session
+      await session.endSession();
     }
-
-    //create token
-    const accessToken = jwtHelper.createToken(
-      { id: user._id, role: user.role, email: user.email },
-      config.jwt.jwt_secret as Secret,
-      '7d'
-    );
-
-    //create token
-    const refreshToken = jwtHelper.createToken(
-      { id: user._id, role: user.role, email: user.email },
-      config.jwt.jwtRefreshSecret as Secret,
-      '15d'
-    );
-
-    return { accessToken, refreshToken };
   }
+
+  throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid login type');
 };
 
 const forgetPasswordToDB = async (email: string) => {

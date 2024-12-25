@@ -4,7 +4,7 @@ import { IDeliveryCofirmation } from './deliveryCofirmation.interface';
 const deliverySchema = new Schema<IDeliveryCofirmation>({
   userId: {
     type: Schema.Types.ObjectId,
-    ref: 'User',
+    ref: 'Driver',
     required: true,
   },
   comment: { type: String },

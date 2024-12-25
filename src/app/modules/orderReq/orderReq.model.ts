@@ -4,7 +4,8 @@ import { IOrderReq } from './orderReq.interface';
 const orderSchema = new Schema<IOrderReq>({
   userId: {
     type: Schema.Types.ObjectId,
-    ref: 'User',
+    ref: 'Client',
+    required: true,
   },
   orderDetails: { type: String, required: true },
   location: {

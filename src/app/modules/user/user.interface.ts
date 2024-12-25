@@ -12,8 +12,7 @@ export type IUser = {
   verified: boolean;
   phone: string;
   image: string;
-  client?: Types.ObjectId;
-  driver?: Types.ObjectId;
+
   appId?: string;
   fcmToken?: string;
   isSuspended: boolean;
@@ -23,8 +22,6 @@ export type IUser = {
     oneTimeCode: number;
     expireAt: Date;
   };
-  createdAt?: Date;
-  updatedAt?: Date;
 };
 
 export type UserModal = {

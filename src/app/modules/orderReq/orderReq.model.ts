@@ -2,7 +2,10 @@ import { model, Schema } from 'mongoose';
 import { IOrderReq } from './orderReq.interface';
 
 const orderSchema = new Schema<IOrderReq>({
-  userId: { type: String, required: true },
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+  },
   orderDetails: { type: String, required: true },
   location: {
     type: {

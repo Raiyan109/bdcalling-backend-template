@@ -27,10 +27,22 @@ const DriverSchema = new mongoose.Schema<IDriver>(
     phone: {
       type: String,
     },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
     status: {
       type: String,
       enum: ['active', 'suspended', 'deleted'],
       default: 'active',
+    },
+    isSuspended: {
+      type: Boolean,
+      default: false,
+    },
+    suspensionEndDate: {
+      type: Date,
     },
   },
   {

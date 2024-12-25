@@ -22,6 +22,18 @@ const createOrder = async (payload: IOrderReq) => {
     );
   }
 
+  const isOrderExist = await Order.findOne({
+    userId: payload.userId,
+    orderDetails: payload.orderDetails,
+  });
+
+  if (isOrderExist) {
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      'You already have an order in progress'
+    );
+  }
+
   const isUserExist: any = await User.findOne({ _id: payload.userId });
 
   if (!isUserExist) {
@@ -71,6 +83,47 @@ const findUsersNearLocation = async (
       'Error finding users near location'
     );
   }
+};
+
+const getAllOrder = async (query: Record<string, unknown>) => {
+  const { searchTerm, page, limit, ...filterData } = query;
+  const anyConditions: any[] = [];
+
+  // Filter by additional filterData fields
+  if (Object.keys(filterData).length > 0) {
+    const filterConditions = Object.entries(filterData).map(
+      ([field, value]) => ({ [field]: value })
+    );
+    anyConditions.push({ $and: filterConditions });
+  }
+
+  anyConditions.push({ status: { $ne: 'completed' } });
+
+  // Combine all conditions
+  const whereConditions =
+    anyConditions.length > 0 ? { $and: anyConditions } : {};
+
+  // Pagination setup
+  const pages = parseInt(page as string) || 1;
+  const size = parseInt(limit as string) || 10;
+  const skip = (pages - 1) * size;
+
+  // Fetch Category data
+  const result = await Order.find(whereConditions)
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(size)
+    .lean();
+
+  const count = await Order.countDocuments(whereConditions);
+
+  return {
+    result,
+    meta: {
+      page: pages,
+      total: count,
+    },
+  };
 };
 
 const getOrderHistory = async (query: Record<string, unknown>) => {
@@ -132,8 +185,71 @@ const getOrderHistory = async (query: Record<string, unknown>) => {
   };
 };
 
+const getNearestAllOrder = async (orderId: string) => {
+  const order = await Order.findById(orderId);
+
+  if (!order) {
+    throw new ApiError(
+      StatusCodes.NOT_FOUND,
+      'This user does not have any orders'
+    );
+  }
+
+  const longitude = order.location.coordinates[0];
+  const latitude = order.location.coordinates[1];
+
+  const orders = await Order.aggregate([
+    {
+      $geoNear: {
+        near: {
+          type: 'Point',
+          coordinates: [longitude, latitude],
+        },
+        distanceField: 'distance',
+        spherical: true,
+        distanceMultiplier: 0.001,
+      },
+    },
+    {
+      $match: {
+        _id: order._id,
+      },
+    },
+    {
+      $lookup: {
+        from: 'ordertypes',
+        localField: 'type',
+        foreignField: '_id',
+        as: 'type',
+      },
+    },
+    {
+      $unwind: {
+        path: '$type',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        type: 1,
+        orderDetails: 1,
+        quantity: 1,
+        location: 1,
+        status: 1,
+        createdAt: 1,
+        updatedAt: 1,
+      },
+    },
+  ]);
+
+  return orders;
+};
+
 export const OrderReqService = {
   createOrder,
   findUsersNearLocation,
   getOrderHistory,
+  getAllOrder,
+  getNearestAllOrder,
 };

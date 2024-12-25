@@ -60,14 +60,7 @@ const userSchema = new Schema<IUser, UserModal>(
       type: Boolean,
       default: false,
     },
-    client: {
-      type: Schema.Types.ObjectId,
-      ref: 'Client',
-    },
-    driver: {
-      type: Schema.Types.ObjectId,
-      ref: 'Driver',
-    },
+
     authentication: {
       type: {
         isResetPassword: {

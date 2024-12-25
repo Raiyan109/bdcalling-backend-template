@@ -1,3 +1,5 @@
+import { Types } from 'mongoose';
+
 export type IDriver = {
   firstName: string;
   lastName: string;
@@ -6,4 +8,7 @@ export type IDriver = {
   status: 'active' | 'suspended' | 'deleted';
   image: string;
   phone: string;
+  userId: Types.ObjectId;
+  isSuspended: boolean;
+  suspensionEndDate?: Date;
 };

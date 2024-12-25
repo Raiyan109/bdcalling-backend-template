@@ -16,6 +16,7 @@ const deliverySchema = new Schema<IDeliveryCofirmation>({
     enum: ['delivered', 'not-delivered', 'problem-occurred'],
     default: 'delivered',
   },
+  deliveryNumber: { type: String },
 });
 
 export const DeliveryCofirmation = model<IDeliveryCofirmation>(

@@ -16,6 +16,13 @@ const setSchedule = async (scheduleData: Partial<IDeliveryTime>) => {
     { new: true, upsert: true }
   );
 
+  const value = {
+    text: 'New Time',
+  };
+
+  if (schedule) {
+  }
+
   return schedule;
 };
 

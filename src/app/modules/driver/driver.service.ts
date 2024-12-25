@@ -21,8 +21,18 @@ const updateDriverProfile = async (id: string, payload: Partial<IDriver>) => {
 };
 
 const getAllUsers = async (query: Record<string, unknown>) => {
-  const { page, limit, ...filterData } = query;
+  const { page, limit, searchTerm, ...filterData } = query;
   const anyConditions: any[] = [{ status: 'active' }];
+
+  if (searchTerm) {
+    const categoriesIds = await Driver.find({
+      firstName: { $regex: searchTerm, $options: 'i' },
+    }).distinct('_id');
+
+    if (categoriesIds.length > 0) {
+      anyConditions.push({ driver: { $in: categoriesIds } });
+    }
+  }
 
   // Filter by additional filterData fields
   if (Object.keys(filterData).length > 0) {

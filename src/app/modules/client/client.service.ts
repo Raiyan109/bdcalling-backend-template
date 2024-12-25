@@ -21,8 +21,19 @@ const updateClientProfile = async (id: string, payload: Partial<IClient>) => {
 };
 
 const getAllUsers = async (query: Record<string, unknown>) => {
-  const { page, limit, ...filterData } = query;
+  const { page, limit, searchTerm, ...filterData } = query;
   const anyConditions: any[] = [{ status: 'active' }];
+
+  // Add searchTerm condition if present
+  if (searchTerm) {
+    const categoriesIds = await Client.find({
+      firstName: { $regex: searchTerm, $options: 'i' },
+    }).distinct('_id');
+
+    if (categoriesIds.length > 0) {
+      anyConditions.push({ client: { $in: categoriesIds } });
+    }
+  }
 
   // Filter by additional filterData fields
   if (Object.keys(filterData).length > 0) {

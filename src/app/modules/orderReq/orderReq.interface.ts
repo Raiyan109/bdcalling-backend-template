@@ -1,7 +1,7 @@
 import { Types } from 'mongoose';
 
 export type IOrderReq = {
-  userId: string;
+  userId: Types.ObjectId;
   orderDetails: string;
   location: {
     type: { type: String; enum: ['Point']; default: 'Point' };

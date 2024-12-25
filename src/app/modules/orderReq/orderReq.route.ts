@@ -17,6 +17,18 @@ router.get(
   OrderReqController.getOrderHistory
 );
 
+router.get(
+  '/get-order',
+  // auth(USER_ROLES.DRIVER),
+  OrderReqController.getOrder
+);
+
+router.get(
+  '/get-single-order/:id',
+  // auth(USER_ROLES.DRIVER),
+  OrderReqController.getNearestAllOrder
+);
+
 router.get('/near', OrderReqController.getAllOrder);
 
 export const OrderReqRoutes = router;

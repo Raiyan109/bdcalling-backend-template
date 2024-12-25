@@ -77,16 +77,6 @@ const updateProfile = catchAsync(
   }
 );
 
-const getAllUser = catchAsync(async (req: Request, res: Response) => {
-  const result = await UserService.getAllUsers(req.query);
-  sendResponse(res, {
-    success: true,
-    statusCode: StatusCodes.OK,
-    message: 'User retrived successfully',
-    data: result,
-  });
-});
-
 const getSingleUser = catchAsync(async (req: Request, res: Response) => {
   const result = await UserService.getSingleUser(req.params.id);
   sendResponse(res, {
@@ -101,7 +91,6 @@ export const UserController = {
   createUser,
   getUserProfile,
   updateProfile,
-  getAllUser,
   getSingleUser,
   createDriverToDB,
 };

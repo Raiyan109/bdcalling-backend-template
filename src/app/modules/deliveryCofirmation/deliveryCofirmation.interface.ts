@@ -6,5 +6,6 @@ export type IDeliveryCofirmation = {
   status: 'delivered' | 'not-delivered' | 'problem-occurred';
   image: string;
   comment: string;
+  deliveryNumber: string;
   problemOccurred?: string[];
 };

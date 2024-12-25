@@ -59,6 +59,16 @@ const getAllOrder = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getOrder = catchAsync(async (req: Request, res: Response) => {
+  const result = await OrderReqService.getAllOrder(req.query);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'All Orders retrieved successfully',
+    data: result,
+  });
+});
+
 const getOrderHistory = catchAsync(async (req: Request, res: Response) => {
   const userId = req.user.id;
 
@@ -76,8 +86,20 @@ const getOrderHistory = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getNearestAllOrder = catchAsync(async (req: Request, res: Response) => {
+  const result = await OrderReqService.getNearestAllOrder(req.params.id);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Single Orders retrieved successfully',
+    data: result,
+  });
+});
+
 export const OrderReqController = {
   createOrder,
   getAllOrder,
   getOrderHistory,
+  getOrder,
+  getNearestAllOrder,
 };

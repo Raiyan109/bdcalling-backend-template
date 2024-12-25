@@ -1,5 +1,4 @@
 import express from 'express';
-
 import { UserController } from './user.controller';
 import { UserValidation } from './user.validation';
 import validateRequest from '../../middlewares/validateRequest';
@@ -17,8 +16,6 @@ router.post(
   validateRequest(UserValidation.createUserZodSchema),
   UserController.createDriverToDB
 );
-
-router.get('/get-all-users', auth(USER_ROLES.ADMIN), UserController.getAllUser);
 
 router.get(
   '/profile',

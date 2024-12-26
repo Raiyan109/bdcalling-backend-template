@@ -17,6 +17,7 @@ import { OrderReqRoutes } from '../app/modules/orderReq/orderReq.route';
 import { TypeRoutes } from '../app/modules/orderType/orderType.route';
 import { DeliveryCofirmationRoutes } from '../app/modules/deliveryCofirmation/deliveryCofirmation.route';
 import { PushNotificationRoutes } from '../app/modules/pushNotification/pushNotification.route';
+import { CommentRoutes } from '../app/modules/comment/comment.route';
 
 const router = express.Router();
 
@@ -39,6 +40,7 @@ const apiRoutes = [
   { path: '/order-type', route: TypeRoutes },
   { path: '/delivery-confirmation', route: DeliveryCofirmationRoutes },
   { path: '/push-notification', route: PushNotificationRoutes },
+  { path: '/comment', route: CommentRoutes },
 ];
 
 apiRoutes.forEach(route => router.use(route.path, route.route));

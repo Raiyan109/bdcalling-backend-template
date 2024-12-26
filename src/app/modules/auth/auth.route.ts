@@ -12,11 +12,7 @@ router.post(
   AuthController.loginUser
 );
 
-router.post(
-  '/login-for-social',
-  // validateRequest(AuthValidation.createLoginZodSchemaForSocial),
-  AuthController.loginUserForSocial
-);
+router.post('/login-for-social', AuthController.loginUserForSocial);
 
 router.post('/refresh-token', AuthController.newAccessToken);
 

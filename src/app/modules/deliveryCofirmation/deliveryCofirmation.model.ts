@@ -10,7 +10,7 @@ const deliverySchema = new Schema<IDeliveryCofirmation>({
   comment: { type: String },
   image: { type: String },
   orderId: { type: Schema.Types.ObjectId, ref: 'Order' },
-  problemOccurred: [{ type: String }],
+  // problemOccurred: [{ type: String }],
   status: {
     type: String,
     enum: ['delivered', 'not-delivered', 'problem-occurred'],

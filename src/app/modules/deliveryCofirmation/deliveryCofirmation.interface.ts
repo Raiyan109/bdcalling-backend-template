@@ -7,5 +7,5 @@ export type IDeliveryCofirmation = {
   image: string;
   comment: string;
   deliveryNumber: string;
-  problemOccurred?: string[];
+  // problemOccurred?: string[];
 };

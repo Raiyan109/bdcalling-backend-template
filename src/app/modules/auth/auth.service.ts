@@ -413,39 +413,116 @@ const newAccessTokenToUser = async (token: string) => {
   return { accessToken };
 };
 
-const resendVerificationEmailToDB = async (email: string) => {
-  // Find the user by ID
-  const existingUser: any = await User.findOne({ email: email }).lean();
+// const resendVerificationEmailToDB = async (email: string) => {
+//   // Find the user by ID
+//   const existingUser: any = await User.findOne({ email: email }).lean();
 
-  if (!existingUser) {
+//   if (!existingUser) {
+//     throw new ApiError(
+//       StatusCodes.NOT_FOUND,
+//       'User with this email does not exist!'
+//     );
+//   }
+
+//   if (existingUser?.isVerified) {
+//     throw new ApiError(StatusCodes.BAD_REQUEST, 'User is already verified!');
+//   }
+
+//   console.log(existingUser);
+
+//   // Generate OTP and prepare email
+//   const otp = generateOTP();
+//   const emailValues = {
+//     name: existingUser.firstName,
+//     otp,
+//     email: existingUser.email,
+//   };
+//   const accountEmailTemplate = emailTemplate.createAccount(emailValues);
+//   emailHelper.sendEmail(accountEmailTemplate);
+
+//   // Update user with authentication details
+//   const authentication = {
+//     oneTimeCode: otp,
+//     expireAt: new Date(Date.now() + 3 * 60000),
+//   };
+
+//   await User.findOneAndUpdate(
+//     { email: email },
+//     { $set: { authentication } },
+//     { new: true }
+//   );
+// };
+
+const resendVerificationEmailToDB = async (email: string) => {
+  // Find the user and associated data using aggregation
+  const existingUser = await User.aggregate([
+    {
+      $match: { email }, // Match by email
+    },
+    {
+      $lookup: {
+        from: 'clients', // Assuming the Client collection is named 'clients'
+        localField: '_id',
+        foreignField: 'userId',
+        as: 'clientData',
+      },
+    },
+    {
+      $lookup: {
+        from: 'drivers', // Assuming the Driver collection is named 'drivers'
+        localField: '_id',
+        foreignField: 'userId',
+        as: 'driverData',
+      },
+    },
+    {
+      $project: {
+        firstName: {
+          $ifNull: [
+            { $arrayElemAt: ['$clientData.firstName', 0] },
+            { $arrayElemAt: ['$driverData.firstName', 0] },
+          ],
+        },
+        isVerified: 1,
+        userType: 1,
+      },
+    },
+  ]);
+
+  // Validate if user exists
+  if (!existingUser.length) {
     throw new ApiError(
       StatusCodes.NOT_FOUND,
       'User with this email does not exist!'
     );
   }
 
-  if (existingUser?.isVerified) {
+  const user = existingUser[0];
+
+  // Check if user is already verified
+  if (user.isVerified) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'User is already verified!');
   }
 
   // Generate OTP and prepare email
   const otp = generateOTP();
   const emailValues = {
-    name: existingUser.firstName,
+    name: user.firstName || 'User', // Default to 'User' if no name is found
     otp,
-    email: existingUser.email,
+    email,
   };
+
   const accountEmailTemplate = emailTemplate.createAccount(emailValues);
   emailHelper.sendEmail(accountEmailTemplate);
 
   // Update user with authentication details
   const authentication = {
     oneTimeCode: otp,
-    expireAt: new Date(Date.now() + 3 * 60000),
+    expireAt: new Date(Date.now() + 3 * 60000), // OTP expires in 3 minutes
   };
 
   await User.findOneAndUpdate(
-    { email: email },
+    { email },
     { $set: { authentication } },
     { new: true }
   );

@@ -5,7 +5,7 @@ export const deliveryConfirmationSchema = z.object({
   comment: z.string().optional(),
   orderId: z.string().optional(),
   deliveryNumber: z.string().optional(),
-  problemOccurred: z.array(z.string()).optional(),
+  // problemOccurred: z.array(z.string()).optional(),
   status: z.enum(['delivered', 'not-delivered', 'problem-occurred']).optional(),
 });
 

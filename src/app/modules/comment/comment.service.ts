@@ -20,9 +20,9 @@ const createCommentToDB = async (payload: Partial<IComment>) => {
     delivery: payload.delivery,
     userId: payload.userId,
   });
-  //   if (isExist) {
-  //     throw new ApiError(StatusCodes.BAD_REQUEST, 'Comment already exists');
-  //   }
+  if (isExist) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Comment already exists');
+  }
 
   const value = {
     ...payload,

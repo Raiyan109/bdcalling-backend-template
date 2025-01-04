@@ -20,6 +20,7 @@ import { ResetToken } from '../resetToken/resetToken.model';
 
 import { startSession } from 'mongoose';
 import { USER_ROLES } from '../../../enums/user';
+import { log } from 'winston';
 
 //login
 const loginUserFromDB = async (payload: ILoginData) => {

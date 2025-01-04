@@ -9,12 +9,12 @@ import generateOTP from '../../../util/generateOTP';
 import { IUser } from './user.interface';
 import { User } from './user.model';
 import unlinkFile from '../../../shared/unlinkFile';
-// import { IClient } from '../client/client.interface';
-// import { Client } from '../client/client.model';
+import { IClient } from '../client/client.interface';
+import { Client } from '../client/client.model';
 // import { Driver } from '../driver/driver.model';
 
-// const createClientToDB = async (payload: Partial<IUser & IClient>) => {
-const createClientToDB = async (payload: Partial<IUser>) => {
+const createClientToDB = async (payload: Partial<IUser & IClient>) => {
+  // const createClientToDB = async (payload: Partial<IUser>) => {
   const session = await startSession();
 
   try {
@@ -49,34 +49,34 @@ const createClientToDB = async (payload: Partial<IUser>) => {
       userId: user._id, // Set the user's _id as the client userId
     };
 
-    // const [client] = await Client.create([clientPayload], {
-    //   session,
-    // });
+    const [client] = await Client.create([clientPayload], {
+      session,
+    });
 
-    // if (!client) {
-    //   throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to create client');
-    // }
+    if (!client) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to create client');
+    }
 
     // Update the user's client reference
-    // const updatedUser = await User.findOneAndUpdate(
-    //   { _id: user._id },
-    //   { $set: { client: client._id } },
-    //   { session, new: true }
-    // );
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: user._id },
+      { $set: { client: client._id } },
+      { session, new: true }
+    );
 
-    // if (!updatedUser) {
-    //   throw new ApiError(StatusCodes.NOT_FOUND, 'User not found for update');
-    // }
+    if (!updatedUser) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'User not found for update');
+    }
 
     // Generate OTP and prepare email
     const otp = generateOTP();
-    // const emailValues = {
-    //   name: client.firstName,
-    //   email: user.email,
-    //   otp: otp,
-    // };
-    // const accountEmailTemplate = emailTemplate.createAccount(emailValues);
-    // emailHelper.sendEmail(accountEmailTemplate);
+    const emailValues = {
+      name: client.firstName,
+      email: user.email,
+      otp: otp,
+    };
+    const accountEmailTemplate = emailTemplate.createAccount(emailValues);
+    emailHelper.sendEmail(accountEmailTemplate);
 
     // Update user with authentication details
     const authentication = {

@@ -9,11 +9,12 @@ import generateOTP from '../../../util/generateOTP';
 import { IUser } from './user.interface';
 import { User } from './user.model';
 import unlinkFile from '../../../shared/unlinkFile';
-import { IClient } from '../client/client.interface';
-import { Client } from '../client/client.model';
-import { Driver } from '../driver/driver.model';
+// import { IClient } from '../client/client.interface';
+// import { Client } from '../client/client.model';
+// import { Driver } from '../driver/driver.model';
 
-const createClientToDB = async (payload: Partial<IUser & IClient>) => {
+// const createClientToDB = async (payload: Partial<IUser & IClient>) => {
+const createClientToDB = async (payload: Partial<IUser>) => {
   const session = await startSession();
 
   try {
@@ -48,34 +49,34 @@ const createClientToDB = async (payload: Partial<IUser & IClient>) => {
       userId: user._id, // Set the user's _id as the client userId
     };
 
-    const [client] = await Client.create([clientPayload], {
-      session,
-    });
+    // const [client] = await Client.create([clientPayload], {
+    //   session,
+    // });
 
-    if (!client) {
-      throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to create client');
-    }
+    // if (!client) {
+    //   throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to create client');
+    // }
 
     // Update the user's client reference
-    const updatedUser = await User.findOneAndUpdate(
-      { _id: user._id },
-      { $set: { client: client._id } },
-      { session, new: true }
-    );
+    // const updatedUser = await User.findOneAndUpdate(
+    //   { _id: user._id },
+    //   { $set: { client: client._id } },
+    //   { session, new: true }
+    // );
 
-    if (!updatedUser) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'User not found for update');
-    }
+    // if (!updatedUser) {
+    //   throw new ApiError(StatusCodes.NOT_FOUND, 'User not found for update');
+    // }
 
     // Generate OTP and prepare email
     const otp = generateOTP();
-    const emailValues = {
-      name: client.firstName,
-      email: user.email,
-      otp: otp,
-    };
-    const accountEmailTemplate = emailTemplate.createAccount(emailValues);
-    emailHelper.sendEmail(accountEmailTemplate);
+    // const emailValues = {
+    //   name: client.firstName,
+    //   email: user.email,
+    //   otp: otp,
+    // };
+    // const accountEmailTemplate = emailTemplate.createAccount(emailValues);
+    // emailHelper.sendEmail(accountEmailTemplate);
 
     // Update user with authentication details
     const authentication = {
@@ -109,7 +110,8 @@ const createClientToDB = async (payload: Partial<IUser & IClient>) => {
     await session.endSession();
   }
 };
-const createDriverToDB = async (payload: Partial<IUser & IClient>) => {
+// const createDriverToDB = async (payload: Partial<IUser & IClient>) => {
+const createDriverToDB = async (payload: Partial<IUser>) => {
   const session = await startSession();
 
   try {
@@ -144,58 +146,58 @@ const createDriverToDB = async (payload: Partial<IUser & IClient>) => {
       userId: user._id, // Set the user's _id as the client userId
     };
 
-    const [driver] = await Driver.create([clientPayload], {
-      session,
-    });
+    // const [driver] = await Driver.create([clientPayload], {
+    //   session,
+    // });
 
-    if (!driver) {
-      throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to create driver');
-    }
+    // if (!driver) {
+    //   throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to create driver');
+    // }
 
-    // Update the user's client reference
-    const updatedUser = await User.findOneAndUpdate(
-      { _id: user._id },
-      { $set: { driver: driver._id } },
-      { session, new: true }
-    );
+    // // Update the user's client reference
+    // const updatedUser = await User.findOneAndUpdate(
+    //   { _id: user._id },
+    //   { $set: { driver: driver._id } },
+    //   { session, new: true }
+    // );
 
-    if (!updatedUser) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'User not found for update');
-    }
+    // if (!updatedUser) {
+    //   throw new ApiError(StatusCodes.NOT_FOUND, 'User not found for update');
+    // }
 
-    // Generate OTP and prepare email
-    const otp = generateOTP();
-    const emailValues = {
-      name: driver.firstName,
-      email: user.email,
-      otp: otp,
-    };
-    const accountEmailTemplate = emailTemplate.createAccount(emailValues);
-    emailHelper.sendEmail(accountEmailTemplate);
+    // // Generate OTP and prepare email
+    // const otp = generateOTP();
+    // const emailValues = {
+    //   name: driver.firstName,
+    //   email: user.email,
+    //   otp: otp,
+    // };
+    // const accountEmailTemplate = emailTemplate.createAccount(emailValues);
+    // emailHelper.sendEmail(accountEmailTemplate);
 
     // Update user with authentication details
-    const authentication = {
-      oneTimeCode: otp,
-      expireAt: new Date(Date.now() + 3 * 60000),
-    };
+    // const authentication = {
+    //   oneTimeCode: otp,
+    //   expireAt: new Date(Date.now() + 3 * 60000),
+    // };
 
-    const updatedAuthenticationUser = await User.findOneAndUpdate(
-      { _id: user._id },
-      { $set: { authentication } },
-      { session, new: true }
-    );
+    // const updatedAuthenticationUser = await User.findOneAndUpdate(
+    //   { _id: user._id },
+    //   { $set: { authentication } },
+    //   { session, new: true }
+    // );
 
-    if (!updatedAuthenticationUser) {
-      throw new ApiError(
-        StatusCodes.NOT_FOUND,
-        'User not found for authentication update'
-      );
-    }
+    // if (!updatedAuthenticationUser) {
+    //   throw new ApiError(
+    //     StatusCodes.NOT_FOUND,
+    //     'User not found for authentication update'
+    //   );
+    // }
 
     // Commit transaction
-    await session.commitTransaction();
+    // await session.commitTransaction();
 
-    return updatedAuthenticationUser;
+    // return updatedAuthenticationUser;
   } catch (error) {
     // Abort transaction on error
     await session.abortTransaction();

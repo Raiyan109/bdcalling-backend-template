@@ -16,9 +16,8 @@ import cryptoToken from '../../../util/cryptoToken';
 import generateOTP from '../../../util/generateOTP';
 import { User } from '../user/user.model';
 import { ResetToken } from '../resetToken/resetToken.model';
-import { sendNotifications } from '../../../helpers/notificationHelper';
-import { Driver } from '../driver/driver.model';
-import { Client } from '../client/client.model';
+// import { sendNotifications } from '../../../helpers/notificationHelper';
+
 import { startSession } from 'mongoose';
 import { USER_ROLES } from '../../../enums/user';
 
@@ -114,41 +113,41 @@ const loginUserSocial = async (payload: ILoginData) => {
         user = newUser;
 
         // Create related entity based on role
-        if (role === USER_ROLES.CLIENT) {
-          await Client.create(
-            [
-              {
-                userId: user._id,
-                email: user.email,
-                status: 'active',
-                firstName: '', // Placeholder
-                lastName: '', // Placeholder
-                address: '', // Placeholder
-                image: '', // Placeholder
-                phone: '', // Placeholder
-              },
-            ],
-            { session }
-          );
-        } else if (role === USER_ROLES.DRIVER) {
-          await Driver.create(
-            [
-              {
-                userId: user._id,
-                email: user.email,
-                status: 'active',
-                firstName: '', // Placeholder
-                lastName: '', // Placeholder
-                address: '', // Placeholder
-                image: '', // Placeholder
-                phone: '', // Placeholder
-                licenseNumber: '', // Placeholder
-                vehicleDetails: '', // Placeholder
-              },
-            ],
-            { session }
-          );
-        }
+        // if (role === USER_ROLES.CLIENT) {
+        //   await Client.create(
+        //     [
+        //       {
+        //         userId: user._id,
+        //         email: user.email,
+        //         status: 'active',
+        //         firstName: '', // Placeholder
+        //         lastName: '', // Placeholder
+        //         address: '', // Placeholder
+        //         image: '', // Placeholder
+        //         phone: '', // Placeholder
+        //       },
+        //     ],
+        //     { session }
+        //   );
+        // } else if (role === USER_ROLES.DRIVER) {
+        //   await Driver.create(
+        //     [
+        //       {
+        //         userId: user._id,
+        //         email: user.email,
+        //         status: 'active',
+        //         firstName: '', // Placeholder
+        //         lastName: '', // Placeholder
+        //         address: '', // Placeholder
+        //         image: '', // Placeholder
+        //         phone: '', // Placeholder
+        //         licenseNumber: '', // Placeholder
+        //         vehicleDetails: '', // Placeholder
+        //       },
+        //     ],
+        //     { session }
+        //   );
+        // }
       }
 
       // Commit transaction
@@ -374,7 +373,7 @@ const changePasswordToDB = async (
   };
 
   if (isExistUser) {
-    sendNotifications(value);
+    // sendNotifications(value);
   }
 };
 

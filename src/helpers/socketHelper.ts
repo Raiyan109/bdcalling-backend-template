@@ -5,7 +5,6 @@ import { User } from '../app/modules/user/user.model';
 import { log } from 'winston';
 
 export const getRecieverSocketId = (recieverId: string): string | undefined => {
-  console.log(userSocketMap, 'userSocketMap');
   return userSocketMap[recieverId];
 };
 

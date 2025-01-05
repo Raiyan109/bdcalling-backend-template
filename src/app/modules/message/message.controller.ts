@@ -42,15 +42,11 @@ const sendMessage = catchAsync(async (req: Request, res: Response) => {
 
   // SOCKET IO Functionality will go here
   const recieverSocketId = getRecieverSocketId(recieverId)
-  console.log(recieverSocketId, 'recieverSocketId');
 
   if (recieverSocketId) {
-
-
     // Used to send events to specific client
     //@ts-ignore
     socketIo.to(recieverSocketId).emit('newMessage', newMessage)
-    socketIo.emit('newMessage', newMessage)
   }
 
   // const result = await ClientService.getAllUsers(req.query);

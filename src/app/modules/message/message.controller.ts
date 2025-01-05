@@ -12,7 +12,8 @@ const sendMessage = catchAsync(async (req: Request, res: Response) => {
   const { message } = req.body
   const { id: recieverId } = req.params as { id: string };
   const senderId = req.user.id as string;
-
+  //@ts-ignore
+  const socketIo = global.io
 
   let conversation = await Conversation.findOne({
     participants: { $all: [senderId, recieverId] }
@@ -41,12 +42,17 @@ const sendMessage = catchAsync(async (req: Request, res: Response) => {
 
   // SOCKET IO Functionality will go here
   const recieverSocketId = getRecieverSocketId(recieverId)
-  console.log(recieverId, 'recieverId from recieverSocketId');
+  console.log(recieverSocketId, 'recieverSocketId');
 
   if (recieverSocketId) {
+
+
     // Used to send events to specific client
-    global.io.to(recieverSocketId).emit('newMessage', newMessage)
+    //@ts-ignore
+    socketIo.to(recieverSocketId).emit('newMessage', newMessage)
+    socketIo.emit('newMessage', newMessage)
   }
+
   // const result = await ClientService.getAllUsers(req.query);
   // const user = req.user;
   // console.log(user._id, 'user from message controller');

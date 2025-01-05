@@ -36,11 +36,12 @@ async function main() {
         origin: '*',
       },
     });
-    socketHelper.socket(io);
     //@ts-ignore
-    // global.io = io;
+    global.io = io;
+    socketHelper.socket(io);
+
     // (global as any).io = io;
-    globalThis.io = io;
+    // globalThis.io = io;
 
   } catch (error) {
     errorLogger.error(colors.red('🤢 Failed to connect Database'));

@@ -5,6 +5,7 @@ import { User } from '../app/modules/user/user.model';
 import { log } from 'winston';
 
 export const getRecieverSocketId = (recieverId: string): string | undefined => {
+  console.log(userSocketMap, 'userSocketMap');
   return userSocketMap[recieverId];
 };
 
@@ -23,6 +24,7 @@ const socket = (io: Server) => {
 
     // io.emit() is used to send events to all the connected clients
     io.emit('getOnlineUsers', Object.keys(userSocketMap))
+    // io.emit('testmessage', 'test from socketHelper')
     console.log(userSocketMap, 'userSocketMap');
 
     // // Handle user login and associate their socket ID

@@ -3,38 +3,77 @@ import catchAsync from '../../../shared/catchAsync';
 
 import sendResponse from '../../../shared/sendResponse';
 import { ClientService } from './message.service';
+import { Conversation } from '../conversation/conversation.model';
+import { Message } from './message.model';
+import { getRecieverSocketId } from '../../../helpers/socketHelper';
+import { Server } from 'socket.io';
 
-const updateClientProfile = catchAsync(async (req: Request, res: Response) => {
-  let image;
-  if (req.files && 'image' in req.files && req.files.image[0]) {
-    image = `/images/${req.files.image[0].filename}`;
+const sendMessage = catchAsync(async (req: Request, res: Response) => {
+  const { message } = req.body
+  const { id: recieverId } = req.params as { id: string };
+  const senderId = req.user.id as string;
+
+
+  let conversation = await Conversation.findOne({
+    participants: { $all: [senderId, recieverId] }
+  })
+
+  if (!conversation) {
+    conversation = await Conversation.create({
+      participants: [senderId, recieverId]
+    })
   }
 
-  const value = {
-    image,
-    ...req.body,
-  };
+  const newMessage = new Message({
+    senderId,
+    recieverId,
+    message
+  })
 
-  const result = await ClientService.updateClientProfile(req.params.id, value);
-  sendResponse(res, {
-    success: true,
-    statusCode: 200,
-    message: 'Client profile updated successfully',
-    data: result,
-  });
-});
+  if (newMessage) {
+    conversation.messages.push(newMessage._id)
+  }
 
-const getAllUsers = catchAsync(async (req: Request, res: Response) => {
-  const result = await ClientService.getAllUsers(req.query);
+  await conversation.save()
+  await newMessage.save()
+
+  await Promise.all([conversation.save(), newMessage.save()])
+
+  // SOCKET IO Functionality will go here
+  const recieverSocketId = getRecieverSocketId(recieverId)
+  console.log(recieverId, 'recieverId from recieverSocketId');
+
+  if (recieverSocketId) {
+    // Used to send events to specific client
+    global.io.to(recieverSocketId).emit('newMessage', newMessage)
+  }
+  // const result = await ClientService.getAllUsers(req.query);
+  // const user = req.user;
+  // console.log(user._id, 'user from message controller');
+
   sendResponse(res, {
     success: true,
     statusCode: 200,
     message: 'Client retrived successfully',
-    data: result,
+    data: newMessage,
   });
 });
 
-export const ClientController = {
-  updateClientProfile,
-  getAllUsers,
+
+const getAllMessages = catchAsync(async (req: Request, res: Response) => {
+  // const result = await ClientService.getAllUsers(req.query);
+  const user = req.user;
+  console.log(user.id, 'user from message controller');
+
+  sendResponse(res, {
+    success: true,
+    statusCode: 200,
+    message: 'Client retrived successfully',
+    // data: result,
+  });
+});
+
+export const MessageController = {
+  getAllMessages,
+  sendMessage
 };

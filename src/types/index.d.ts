@@ -1,3 +1,4 @@
+import { Server } from 'socket.io';
 import { JwtPayload } from 'jsonwebtoken';
 
 declare global {
@@ -5,5 +6,9 @@ declare global {
     interface Request {
       user: JwtPayload;
     }
+  }
+
+  interface GlobalThis {
+    io: Server;
   }
 }

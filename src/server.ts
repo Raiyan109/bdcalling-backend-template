@@ -34,7 +34,7 @@ async function main() {
   try {
     const chatCompletion = await getGroqChatCompletion();
     // Print the completion returned by the LLM.
-    console.log(chatCompletion.choices[0]?.message?.content || "");
+    // console.log(chatCompletion.choices[0]?.message?.content || "");
 
     seedAdmin();
     mongoose.connect(config.database_url as string);
